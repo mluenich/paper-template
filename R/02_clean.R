@@ -1,5 +1,8 @@
-infile <- "data/derived/data_raw.rds"
-outfile <- "data/derived/data_clean.rds"
+source("R/99_config.R")
+cfg <- read_config()
+
+infile <- file.path(cfg$paths$derived_data_dir, "data_raw.rds")
+outfile <- file.path(cfg$paths$derived_data_dir, "data_clean.rds")
 
 if (!file.exists(infile)) stop("Missing input file: ", infile, call. = FALSE)
 
