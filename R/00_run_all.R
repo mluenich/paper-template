@@ -1,8 +1,4 @@
 use_renv <- FALSE
-render_manuscript <- TRUE
-
-manuscript_file_rmd <- "manuscript/paper.Rmd"
-render_output_dir <- "output"
 
 options(warn = 1)
 
@@ -27,12 +23,17 @@ if (!is.na(script_dir) && basename(script_dir) == "R") {
   setwd(dirname(script_dir))
 }
 
+Sys.setenv(PAPER_CONFIG = Sys.getenv("PAPER_CONFIG", unset = "config/params.yml"))
+stop_if_missing("R/99_config.R")
+source("R/99_config.R")
+cfg <- read_config()
+
 ensure_dirs(c(
-  "data/raw",
-  "data/derived",
-  "output/figures",
-  "output/tables",
-  "output/checkpoints"
+  cfg$paths$raw_data_dir,
+  cfg$paths$derived_data_dir,
+  cfg$paths$figures_dir,
+  cfg$paths$tables_dir,
+  cfg$paths$checkpoints_dir
 ))
 
 if (use_renv && file.exists("renv.lock")) {
@@ -50,11 +51,9 @@ run_step("02_clean.R", source("R/02_clean.R", local = new.env()))
 run_step("03_analysis.R", source("R/03_analysis.R", local = new.env()))
 run_step("04_figures_tables.R", source("R/04_figures_tables.R", local = new.env()))
 
-if (render_manuscript) {
-  stop_if_missing(manuscript_file_rmd)
+if (isTRUE(cfg$render$enable)) {
+  stop_if_missing(cfg$render$input)
   if (!requireNamespace("rmarkdown", quietly = TRUE)) install.packages("rmarkdown")
-
-  date_prefix <- format(Sys.Date(), "%Y%m%d_")
 
   add_date_prefix <- function(out_file) {
     if (length(out_file) < 1 || is.null(out_file) || is.na(out_file[1])) {
@@ -64,6 +63,7 @@ if (render_manuscript) {
     if (!file.exists(out_file)) {
       stop("Rendered file not found: ", out_file, call. = FALSE)
     }
+    date_prefix <- format(Sys.Date(), "%Y%m%d_")
     new_file <- file.path(dirname(out_file), paste0(date_prefix, basename(out_file)))
     if (file.exists(new_file)) file.remove(new_file)
     ok <- file.rename(out_file, new_file)
@@ -73,11 +73,11 @@ if (render_manuscript) {
 
   run_step("Knit R Markdown manuscript", {
     out_file <- rmarkdown::render(
-      input = manuscript_file_rmd,
-      output_dir = render_output_dir,
+      input = cfg$render$input,
+      output_dir = cfg$render$output_dir,
       clean = TRUE
     )
-    add_date_prefix(out_file)
+    if (isTRUE(cfg$render$date_prefix)) add_date_prefix(out_file) else out_file
   })
 }
 
