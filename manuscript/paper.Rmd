@@ -1,0 +1,55 @@
+---
+title: "Paper title"
+author: "Author name"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  html_document:
+    toc: true
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Overview
+
+This template separates:
+- pipeline scripts in `R/`
+- manuscript in `manuscript/`
+- generated outputs in `output/`
+
+To rebuild everything, run:
+
+```r
+source("R/00_run_all.R")
+```
+
+## Data
+
+```{r}
+dat <- readRDS("../data/derived/data_clean.rds")
+head(dat)
+```
+
+## Model
+
+```{r}
+fit <- readRDS("../output/checkpoints/model.rds")
+summary(fit)
+```
+
+## Figure
+
+```{r, fig.cap="Example figure produced by the pipeline."}
+knitr::include_graphics("../output/figures/figure1.png")
+```
+
+## Table
+
+```{r}
+tab <- read.csv("../output/tables/table1.csv")
+tab
+```
+
+## References

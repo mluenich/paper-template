@@ -1,0 +1,42 @@
+# R / RStudio
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# renv
+renv/library/
+renv/python/
+renv/staging/
+renv/local/
+renv.lock.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data: ignore by default (keep template example)
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/example.csv
+
+data/derived/*
+!data/derived/.gitkeep
+
+# Outputs: ignore by default
+output/*
+!output/figures/.gitkeep
+!output/tables/.gitkeep
+!output/checkpoints/.gitkeep
+
+# Render intermediates
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*_cache/
+*_files/
