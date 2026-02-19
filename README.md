@@ -43,5 +43,4 @@ renv::restore()
 
 ## Notes
 
-- Replace `data/raw/example.csv` with your actual inputs (kept out of git by default; see `.gitignore`).
 - Decide whether to version `data/derived/` outputs in git. Default here is: not versioned.
