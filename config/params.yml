@@ -1,0 +1,20 @@
+# Minimal project configuration (YAML)
+# Keep this file under version control.
+
+paths:
+  raw_data_dir: "data/raw"
+  derived_data_dir: "data/derived"
+  output_dir: "output"
+  figures_dir: "output/figures"
+  tables_dir: "output/tables"
+  checkpoints_dir: "output/checkpoints"
+
+analysis:
+  seed: 123
+  fast_mode: false
+
+render:
+  enable: true
+  input: "manuscript/paper.Rmd"
+  output_dir: "output"
+  date_prefix: true
