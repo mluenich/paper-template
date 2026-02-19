@@ -10,6 +10,9 @@ bibliography: references.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+source("../R/99_config.R")
+cfg <- read_config("../config/params.yml")
 ```
 
 ## Overview
@@ -18,8 +21,9 @@ This template separates:
 - pipeline scripts in `R/`
 - manuscript in `manuscript/`
 - generated outputs in `output/`
+- project parameters in `config/params.yml`
 
-To rebuild everything, run:
+To rebuild everything, run from the project root:
 
 ```r
 source("R/00_run_all.R")
@@ -28,27 +32,27 @@ source("R/00_run_all.R")
 ## Data
 
 ```{r}
-dat <- readRDS("../data/derived/data_clean.rds")
+dat <- readRDS(file.path("..", cfg$paths$derived_data_dir, "data_clean.rds"))
 head(dat)
 ```
 
 ## Model
 
 ```{r}
-fit <- readRDS("../output/checkpoints/model.rds")
+fit <- readRDS(file.path("..", cfg$paths$checkpoints_dir, "model.rds"))
 summary(fit)
 ```
 
 ## Figure
 
 ```{r, fig.cap="Example figure produced by the pipeline."}
-knitr::include_graphics("../output/figures/figure1.png")
+knitr::include_graphics(file.path("..", cfg$paths$figures_dir, "figure1.png"))
 ```
 
 ## Table
 
 ```{r}
-tab <- read.csv("../output/tables/table1.csv")
+tab <- read.csv(file.path("..", cfg$paths$tables_dir, "table1.csv"))
 tab
 ```
 
