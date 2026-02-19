@@ -1,9 +1,10 @@
-# Paper template (R Markdown)
+# Paper template (R Markdown) + minimal config
 
-Minimal folder structure for writing papers with **R scripts + R Markdown**.
+Minimal folder structure for writing papers with **R scripts + R Markdown**, plus a tiny `config/` layer.
 
 ## Structure
 
+- `config/` — project parameters (paths, seed, render switches)
 - `data/raw/` — raw inputs (do not edit in place)
 - `data/derived/` — derived datasets (reproducible outputs of scripts)
 - `R/` — analysis pipeline scripts
@@ -20,10 +21,27 @@ source("R/00_run_all.R")
 ```
 
 This will:
+- read `config/params.yml`
 - create standard folders (if missing)
 - run `R/01_import.R` → `R/04_figures_tables.R`
 - render `manuscript/paper.Rmd` into `output/`
 - rename the rendered file to `yyyymmdd_<originalname>.*`
+
+## Config usage
+
+All scripts use:
+
+```r
+source("R/99_config.R")
+cfg <- read_config()
+```
+
+You can point to a different config file via environment variable:
+
+```r
+Sys.setenv(PAPER_CONFIG = "config/params.yml")
+source("R/00_run_all.R")
+```
 
 ## Using renv (optional)
 
