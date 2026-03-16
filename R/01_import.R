@@ -1,12 +1,12 @@
-source("R/99_config.R")
-cfg <- read_config()
+## R/01_import.R
+source("R/00_setup.R")
 
-infile <- file.path(cfg$paths$raw_data_dir, "example.csv")
-outfile <- file.path(cfg$paths$derived_data_dir, "data_raw.rds")
+infile  <- path_raw("example.csv")
+outfile <- path_derived(artifacts$import_rds)
 
 if (!file.exists(infile)) stop("Missing input file: ", infile, call. = FALSE)
 
 dat <- read.csv(infile, stringsAsFactors = FALSE)
-saveRDS(dat, outfile)
+write_derived(dat, artifacts$import_rds)
 
 message("Wrote: ", outfile)

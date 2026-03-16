@@ -1,16 +1,15 @@
-source("R/99_config.R")
-cfg <- read_config()
+## R/03_analysis.R
+source("R/00_setup.R")
 
-set.seed(cfg$analysis$seed)
-
-infile <- file.path(cfg$paths$derived_data_dir, "data_clean.rds")
-outfile <- file.path(cfg$paths$checkpoints_dir, "model.rds")
+infile  <- path_derived(artifacts$clean_rds)
+outfile <- path_ckpt(artifacts$models_rds)
 
 if (!file.exists(infile)) stop("Missing input file: ", infile, call. = FALSE)
 
-dat <- readRDS(infile)
+dat <- read_derived(artifacts$clean_rds)
 
 fit <- lm(y ~ x + group, data = dat)
-saveRDS(fit, outfile)
+
+write_checkpoint(fit, artifacts$models_rds)
 
 message("Wrote: ", outfile)
