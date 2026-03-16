@@ -1,42 +1,30 @@
-# R / RStudio
+# R
 .Rhistory
+.Rdata
 .RData
 .Ruserdata
-.Rproj.user/
+*.Rproj.user/
 
 # renv
 renv/library/
-renv/python/
-renv/staging/
 renv/local/
-renv.lock.tmp
+renv/staging/
+renv/python/
+
+# Output (reproducible — rebuild via 00_run_all.R)
+output/
+data/derived/
+
+# LaTeX intermediates
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.tex
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Data: ignore by default (keep template example)
-data/raw/*
-!data/raw/.gitkeep
-!data/raw/example.csv
-
-data/derived/*
-!data/derived/.gitkeep
-
-# Outputs: ignore by default
-output/*
-!output/figures/.gitkeep
-!output/tables/.gitkeep
-!output/checkpoints/.gitkeep
-
-# Render intermediates
-*.aux
-*.bbl
-*.blg
-*.log
-*.out
-*.toc
-*.lof
-*.lot
-*_cache/
-*_files/
