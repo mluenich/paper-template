@@ -1,59 +1,129 @@
 ---
-title: "Paper title"
-author: "Author name"
-date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+title: "Paper Title"
+# author:
+#   - name: "[Author 1]"
+#     affiliation: "[Affiliation 1]"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
-  html_document:
-    toc: true
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: true
+    toc: false
+    keep_tex: false
+    fig_caption: true
+    extra_dependencies:
+      - booktabs
+      - longtable
+      - array
+      - float
+      - amsmath
+      - graphicx
+      - setspace
+      - geometry
+      - threeparttable
+      - threeparttablex
+      - multirow
+      - rotating
+    includes:
+      in_header: null
+geometry: margin=2.5cm
+fontsize: 12pt
+linestretch: 1.5
 bibliography: references.bib
+# csl: apa.csl
+header-includes:
+  - \usepackage{caption}
+  - \captionsetup[table]{skip=6pt}
+  - \captionsetup[figure]{skip=6pt}
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+## ---- setup ----
 
-source("../R/99_config.R")
-cfg <- read_config("../config/params.yml")
+## Ensure knitr evaluates relative paths from the project root,
+## not from manuscript/ (where this .Rmd lives).
+knitr::opts_knit$set(root.dir = here::here())
+
+knitr::opts_chunk$set(
+  echo       = FALSE,
+  warning    = FALSE,
+  message    = FALSE,
+  fig.align  = "center",
+  fig.pos    = "H",
+  out.width  = "100%",
+  dpi        = 300
+)
+
+## ---- Load pipeline artifacts ------------------------------------------------
+## NOTE: This file is designed to be rendered by 00_run_all.R.
+##       At render time, the pipeline has already run 01--04 and all artifacts
+##       exist. If rendering standalone, ensure 00_run_all.R has completed.
+
+## Ensure working directory is project root before sourcing setup
+setwd(here::here())
+
+source(here::here("R/00_setup.R"))
+
+dat <- readRDS(path_derived(artifacts$clean_rds))
+fit <- readRDS(path_ckpt(artifacts$models_rds))
+
+## ---- LaTeX table objects (built by 04_figures_tables.R) ---------------------
+library(kableExtra)
+tables_tex <- readRDS(path_ckpt("tables_tex.rds"))
+
+## ---- Formatting helpers (mirror 00_setup.R, available for inline R) ---------
+## fmt_num() and fmt_p() are already loaded via 00_setup.R
 ```
 
-## Overview
+\newpage
 
-This template separates:
-- pipeline scripts in `R/`
-- manuscript in `manuscript/`
-- generated outputs in `output/`
-- project parameters in `config/params.yml`
+# Abstract {-}
 
-To rebuild everything, run from the project root:
+[TODO: Write abstract.]
 
-```r
-source("R/00_run_all.R")
+\vspace{1em}
+\noindent \textbf{Keywords:} keyword1, keyword2, keyword3
+
+\newpage
+
+# Introduction
+
+[TODO]
+
+# Method
+
+[TODO]
+
+# Results
+
+```{r table1-regression, results='asis'}
+tables_tex$t1
 ```
 
-## Data
-
-```{r}
-dat <- readRDS(file.path("..", cfg$paths$derived_data_dir, "data_clean.rds"))
-head(dat)
+```{r fig1, results='asis'}
+.src <- here::here("output", "figures", "figure1.png")
+if (file.exists(.src)) {
+  .tmp <- file.path(tempdir(), "figure1.png")
+  file.copy(.src, .tmp, overwrite = TRUE)
+  .tex_path <- gsub("\\\\", "/", .tmp)
+  cat("\\begin{figure}[H]",
+      "\\centering",
+      sprintf("\\includegraphics[width=0.95\\textwidth]{%s}", .tex_path),
+      "\\caption{Example Figure}",
+      "\\label{fig:fig1}",
+      "\\end{figure}", sep = "\n")
+}
 ```
 
-## Model
+# Discussion
 
-```{r}
-fit <- readRDS(file.path("..", cfg$paths$checkpoints_dir, "model.rds"))
-summary(fit)
-```
+[TODO]
 
-## Figure
+# Conclusion
 
-```{r, fig.cap="Example figure produced by the pipeline."}
-knitr::include_graphics(file.path("..", cfg$paths$figures_dir, "figure1.png"))
-```
+[TODO]
 
-## Table
+# References
 
-```{r}
-tab <- read.csv(file.path("..", cfg$paths$tables_dir, "table1.csv"))
-tab
-```
-
-## References
+::: {#refs}
+:::
