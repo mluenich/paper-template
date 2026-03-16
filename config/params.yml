@@ -1,4 +1,4 @@
-# Minimal project configuration (YAML)
+# Project configuration (YAML)
 # Keep this file under version control.
 
 paths:
@@ -12,6 +12,9 @@ paths:
 analysis:
   seed: 123
   fast_mode: false
+  scipen: 5
+  miss_codes: [-98, -99]
+  ref_industry_target: "Information technology and data processing"
 
 render:
   enable: true
