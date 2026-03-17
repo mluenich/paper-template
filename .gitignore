@@ -28,3 +28,4 @@ data/derived/
 # OS
 .DS_Store
 Thumbs.db
+.Rproj.user
