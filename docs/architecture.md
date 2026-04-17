@@ -1,10 +1,24 @@
 # Architecture — Paper Template
 
-> Context-reconstruction file for LLM sessions. Read instead of scanning source files.
+## TL;DR — Session Bootstrap
 
-## Goal
+Reproducible empirical-paper template: linear R pipeline + R Markdown manuscript. Entry point: `source("R/00_run_all.R")`.
 
-Linear R pipeline (import → clean → analyse → figures/tables) + R Markdown manuscript rendering from pre-built artifacts. All paths/seeds/switches in `config/params.yml`; no hardcoded paths.
+**Execution order:** `00_setup.R` → `01_import.R` → `02_clean.R` → `03_analysis.R` → `04_figures_tables.R` → (optional `10_appendix.R`) → `rmarkdown::render(paper.Rmd)`.
+
+**Config:** `config/params.yml` — all paths, seeds, switches. No script hardcodes paths.
+
+**Data flow:** `data/raw/` → `data/derived/*.rds` → `output/checkpoints/*.rds` + `output/figures/` + `output/tables/` → `output/<date>_paper.pdf`. The manuscript loads pre-built artifacts only; it never runs analysis.
+
+**Editing a new paper:** replace raw data + adapt `01_import.R`; expand `02_clean.R`; replace model in `03_analysis.R`; add figures/tables in `04_figures_tables.R` + chunks in `paper.Rmd`; update `config/params.yml`, `references.bib`, manuscript metadata.
+
+**Conventions to preserve:** all I/O via `path_*()` / `write_derived()` / `write_checkpoint()` helpers; table objects as `tables_tex$t1` etc.; LaTeX cross-refs (`\ref{tab:...}`, `\ref{fig:...}`); `t` and `p` column labels in result tables.
+
+**Current placeholders:** `example.csv` (toy data), example `lm()` in `03_analysis.R`, one figure/table in `04_figures_tables.R`, all manuscript sections `[TODO]`, `10_appendix.R` is a stub. No `renv.lock` shipped.
+
+---
+
+*The rest of this file is reference material. Read on demand, not every session.*
 
 ## Structure
 
@@ -25,6 +39,8 @@ manuscript/references.bib  # BibTeX
 output/{figures,tables,checkpoints}/  # all gitignored, reproducible
 docs/architecture.md       # this file
 ```
+
+Gitignored: `output/`, `data/derived/`, `.Rproj.user/`, `*.tex`, renv library.
 
 ## Pipeline Flow
 
@@ -72,10 +88,7 @@ Sourced by every script. Side effects: `set.seed()`, `options(scipen)`, creates 
 | `recode_missing(df, vars, codes)` | replace `miss_codes` with `NA` |
 | `fmt_num(x, d=3)` | format numeric, strip leading zero, NA → em-dash |
 | `fmt_p(p, d=3, thr=.001)` | format p-value, `< .001` threshold |
-| `stop_if_missing(path)` | fail if file absent |
-| `ensure_dirs(dirs)` | mkdir -p |
-| `load_pkgs(pkgs, install)` | fail-fast package check |
-| `%||%` | null-coalescing |
+| `stop_if_missing`, `ensure_dirs`, `load_pkgs`, `%||%` | guards, dir creation, package check, null-coalescing |
 
 Required packages: `here`, `readr`, `dplyr`, `tidyr`, `tibble`, `ggplot2`, `knitr`, `kableExtra`.
 
@@ -102,18 +115,6 @@ PDF via `xelatex`, `keep_tex: true` (gitignored), `number_sections: true`, 12pt,
 `root.dir = here::here()`. Setup chunk sources `00_setup.R`, loads `dat`, `fit`, `tables_tex` from pre-built artifacts. Tables via `results='asis'` chunks. Figures via `knitr::include_graphics(path_out_fig(...))`. Cross-refs: `\ref{tab:...}` / `\ref{fig:...}` (LaTeX native). Bibliography via Pandoc citeproc; CSL slot commented out.
 
 Sections: Abstract `{-}` → Introduction (§1) → Method → Results → Discussion → Conclusion → References.
-
-## Customisation Checklist
-
-1. Replace `data/raw/example.csv`; adapt `01_import.R`
-2. Expand `02_clean.R` (recoding, filtering, variable construction)
-3. Replace model in `03_analysis.R`
-4. Add figures/tables in `04_figures_tables.R` + corresponding chunks in `paper.Rmd`
-5. Edit `required_pkgs` in `00_setup.R`
-6. Adjust `config/params.yml`
-7. Manuscript metadata: title, author, CSL in `paper.Rmd` YAML
-8. Populate `references.bib`; uncomment `csl:` if needed
-9. Expand `R/10_appendix.R` for supplementary analyses
 
 ## Design Notes
 
