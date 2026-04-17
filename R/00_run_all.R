@@ -1,13 +1,15 @@
 ## R/00_run_all.R
 
 ## ---- Settings ---------------------------------------------------------------
-use_renv <- FALSE
+use_renv <- TRUE
 
 ## Optional local override (config still applies)
 render_manuscript <- TRUE
 
 ## Warnings (1 = print as they occur; 2 = turn warnings into errors)
+.warn_prev <- getOption("warn")
 options(warn = 1)
+on.exit(options(warn = .warn_prev), add = TRUE)
 
 ## ---- Helpers ----------------------------------------------------------------
 run_step <- function(label, expr) {
@@ -29,9 +31,16 @@ if (!is.na(script_dir) && basename(script_dir) == "R") {
 }
 
 ## ---- Optional: renv restore (BEFORE setup/package loads) --------------------
-if (use_renv && file.exists("renv.lock")) {
+## ---- Optional: renv restore (BEFORE setup/package loads) --------------------
+if (use_renv) {
   if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-  run_step("renv::restore()", renv::restore(prompt = FALSE))
+  if (file.exists("renv.lock")) {
+    run_step("renv::restore()", renv::restore(prompt = FALSE))
+  } else {
+    run_step("renv::init()", renv::init(bare = TRUE))
+    message("No renv.lock found — initialised renv. ",
+            "Run renv::snapshot() after installing packages.")
+  }
 }
 
 ## ---- Setup (loads config + paths + packages + helpers) ----------------------
