@@ -52,7 +52,7 @@ paths <- list(
   figures_dir       = cfg$paths$figures_dir      %||% file.path("output", "figures"),
   tables_dir        = cfg$paths$tables_dir       %||% file.path("output", "tables"),
   checkpoints_dir   = cfg$paths$checkpoints_dir  %||% file.path("output", "checkpoints"),
-  render_output_dir = cfg$render$output_dir      %||% file.path("output", "rendered")
+  render_output_dir = cfg$render$output_dir      %||% "output"
 )
 
 ensure_dirs(unname(paths))
@@ -61,7 +61,6 @@ ensure_dirs(unname(paths))
 artifacts <- list(
   import_rds  = "01_import.rds",
   clean_rds   = "02_clean.rds",
-  scored_rds  = "03_scored.rds",
   models_rds  = "models.rds"
 )
 
@@ -93,7 +92,7 @@ read_checkpoint <- function(filename) {
 ## ---- Packages ---------------------------------------------------------------
 ## Adjust this list to your project's needs.
 required_pkgs <- c(
-  "dplyr", "tidyr", "tibble",
+  "here", "readr", "dplyr", "tidyr", "tibble",
   "ggplot2", "knitr", "kableExtra"
 )
 
