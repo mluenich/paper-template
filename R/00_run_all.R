@@ -1,7 +1,7 @@
 ## R/00_run_all.R
 
 ## ---- Settings ---------------------------------------------------------------
-use_renv <- TRUE
+use_renv <- FALSE
 
 ## Optional local override (config still applies)
 render_manuscript <- TRUE
