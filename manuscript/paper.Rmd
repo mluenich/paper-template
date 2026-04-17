@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
     number_sections: true
     toc: false
-    keep_tex: false
+    keep_tex: true
     fig_caption: true
     extra_dependencies:
       - booktabs
@@ -100,18 +100,10 @@ tables_tex <- readRDS(path_ckpt("tables_tex.rds"))
 tables_tex$t1
 ```
 
-```{r fig1, results='asis'}
-.src <- here::here("output", "figures", "figure1.png")
+```{r fig1, fig.cap="Example Figure", fig.align="center", out.width="95%"}
+.src <- path_out_fig("figure1.png")
 if (file.exists(.src)) {
-  .tmp <- file.path(tempdir(), "figure1.png")
-  file.copy(.src, .tmp, overwrite = TRUE)
-  .tex_path <- gsub("\\\\", "/", .tmp)
-  cat("\\begin{figure}[H]",
-      "\\centering",
-      sprintf("\\includegraphics[width=0.95\\textwidth]{%s}", .tex_path),
-      "\\caption{Example Figure}",
-      "\\label{fig:fig1}",
-      "\\end{figure}", sep = "\n")
+  knitr::include_graphics(.src)
 }
 ```
 
