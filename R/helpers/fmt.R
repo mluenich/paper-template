@@ -3,8 +3,11 @@
 
 strip_leading_zero <- function(x) gsub("^(-?)0\\.", "\\1.", x)
 
-fmt_num <- function(x, d = 3) {
-  strip_leading_zero(ifelse(is.na(x), "\u2014", formatC(x, digits = d, format = "f")))
+## APA: lead0 = FALSE for values bounded by 1 (r, beta, alpha, R2, p);
+## lead0 = TRUE for values that can exceed 1 (B, SE, t, M, SD).
+fmt_num <- function(x, d = 3, lead0 = FALSE) {
+  out <- ifelse(is.na(x), "\u2014", formatC(x, digits = d, format = "f"))
+  if (isTRUE(lead0)) out else strip_leading_zero(out)
 }
 
 ## Table cells: "<.001" / ".012"
