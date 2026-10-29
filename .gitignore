@@ -15,6 +15,14 @@ renv/python/
 output/
 data/derived/
 
+# Raw data (not versioned; may be confidential). Example data stays tracked.
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/example.csv
+
+# Machine-specific config overrides
+config/params.local.yml
+
 # LaTeX intermediates
 *.aux
 *.log
@@ -23,7 +31,16 @@ data/derived/
 *.bbl
 *.blg
 *.synctex.gz
-*.tex
+*.fls
+*.fdb_latexmk
+*.xdv
+manuscript/*.tex
+
+# knitr/rmarkdown intermediates
+*.knit.md
+*.utf8.md
+*_files/
+*_cache/
 
 # OS
 .DS_Store

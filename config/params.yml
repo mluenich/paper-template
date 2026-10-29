@@ -1,5 +1,9 @@
 # Project configuration (YAML)
 # Keep this file under version control.
+# Machine-specific overrides (e.g., local or Sciebo data paths) go into
+# config/params.local.yml (gitignored); it is merged over this file.
+
+template_version: "1.1.0"
 
 paths:
   raw_data_dir: "data/raw"
@@ -14,9 +18,33 @@ analysis:
   fast_mode: false
   scipen: 5
   miss_codes: [-98, -99]
+  weight_var: null          # e.g. "pond"; enables R/helpers/survey.R (needs 'survey')
+
+figures:
+  width: 6.5                # inches
+  height: 4.5               # inches
+  dpi: 300
+  pdf: false                # also write a vector PDF next to each PNG
 
 render:
   enable: true
-  input: "manuscript/paper.Rmd"
+  inputs:
+    - "manuscript/paper.Rmd"
+    - "manuscript/appendix.Rmd"
   output_dir: "output"
-  date_prefix: true
+  date_prefix: true         # YYMMDD_ prefix on rendered files
+  anonymous: false          # additionally render *_blind.pdf without author info
+  word_count: true          # report word counts after rendering
+
+osf:
+  # Whitelist for R/99_export_osf.R. Raw data are never included.
+  include:
+    - "R"
+    - "config/params.yml"
+    - "manuscript"
+    - "docs"
+    - "README.md"
+    - "CHANGELOG.md"
+    - "paper-template.Rproj"
+  include_derived: false    # add data/derived/ (only if shareable)
+  include_output: true      # add rendered PDFs, tables, figures, session_info.txt

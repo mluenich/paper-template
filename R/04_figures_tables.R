@@ -10,17 +10,20 @@ if (!file.exists(model_file)) stop("Missing input file: ", model_file, call. = F
 dat <- read_derived(artifacts$clean_rds)
 fit <- read_checkpoint(artifacts$models_rds)
 
-library(kableExtra)
+library(ggplot2)
 
 ## ---- Figures ----------------------------------------------------------------
-fig_file <- path_out_fig("figure1.png")
+## save_fig() writes PNG (ragg) and, if figures$pdf is TRUE, a vector PDF.
+dat$fitted <- fitted(fit)
 
-png(fig_file, width = 1600, height = 1200, res = 200)
-plot(dat$x, dat$y, xlab = "x", ylab = "y", pch = 19)
-abline(fit, lwd = 2)
-dev.off()
+fig1 <- ggplot(dat, aes(x = x, y = y, colour = group)) +
+  geom_point(size = 2) +
+  geom_line(aes(y = fitted), linewidth = 0.8) +
+  labs(x = "x", y = "y", colour = "Group") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
 
-message("Wrote: ", fig_file)
+save_fig(fig1, "figure1.png")
 
 ## ---- Tables (LaTeX objects for manuscript) ----------------------------------
 ## Collect all kableExtra table objects for use in the .Rmd.
@@ -32,25 +35,43 @@ coefs$term <- rownames(coefs)
 rownames(coefs) <- NULL
 coefs <- coefs[, c("term", "Estimate", "Std. Error", "t value", "Pr(>|t|)")]
 
-tables_tex$t1 <- kbl(coefs,
-  format    = "latex",
-  booktabs  = TRUE,
-  linesep   = "",
+coefs_fmt <- data.frame(
+  term = coefs$term,
+  B    = fmt_num(coefs$Estimate, 2),
+  SE   = fmt_num(coefs$`Std. Error`, 2),
+  t    = fmt_num(coefs$`t value`, 2),
+  p    = fmt_p(coefs$`Pr(>|t|)`),
+  stringsAsFactors = FALSE
+)
+
+tables_tex$t1 <- tbl_tex(coefs_fmt,
   col.names = c("Predictor", "$B$", "SE", "$t$", "$p$"),
   align     = c("l", rep("r", 4)),
-  escape    = FALSE,
   caption   = "Regression Results",
-  label     = "regression"
-) |>
-  kable_styling(
-    latex_options = "HOLD_position",
-    font_size     = 10
-  )
+  label     = "regression",
+  note      = paste0("OLS regression; $N = ", nrow(dat), "$. ",
+                     "Reference category for group: A.")
+)
 
-saveRDS(tables_tex, path_ckpt("tables_tex.rds"))
+write_checkpoint(tables_tex, artifacts$tables_rds)
 
-## Also save CSV for inspection
+## Also save CSV for inspection (unformatted values)
 write.csv(coefs, path_out_tab("table1.csv"), row.names = FALSE)
 
-message("Wrote: ", path_ckpt("tables_tex.rds"))
+message("Wrote: ", path_ckpt(artifacts$tables_rds))
 message("Wrote: ", path_out_tab("table1.csv"))
+
+## ---- Report values (inline numbers for the manuscript) ----------------------
+## Named list of pre-formatted strings; paper.Rmd uses `r rpt$...` only.
+rpt <- list(
+  n      = nrow(dat),
+  b_x    = fmt_num(coef(fit)[["x"]], 2),
+  t_x    = fmt_num(coefs$`t value`[coefs$term == "x"], 2),
+  df_res = fit$df.residual,
+  p_x    = fmt_p_inline(coefs$`Pr(>|t|)`[coefs$term == "x"]),
+  r2     = fmt_num(summary(fit)$r.squared, 2)
+)
+
+write_checkpoint(rpt, artifacts$report_rds)
+
+message("Wrote: ", path_ckpt(artifacts$report_rds))
