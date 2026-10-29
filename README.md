@@ -2,7 +2,7 @@
 
 Reproducible paper template with **R scripts + R Markdown**, a shared setup layer (`00_setup.R`), and YAML-based configuration.
 
-The pipeline is based on the way I write manuscripts with R and R Markdown and reflects many years of experience in writing research papers with an empirical focus. I used ChatGPT and Claude to refine the template and to prepare it for publication. More on [marcoluenich.com](https://marcoluenich.com/project/paper-template/).
+The pipeline is based on the way I write manuscripts with R and R Markdown and reflects many years of experience in writing research papers with an empirical focus. I used ChatGPT and Claude to refine the template and to prepare it for publication. More on [marcoluenich.com](https://marcoluenich.com/resource/paper-template/).
 
 Architecture, data flow, helper reference and conventions: [`docs/architecture.md`](docs/architecture.md). Working rules for LLM sessions: [`CLAUDE.md`](CLAUDE.md). Version history: [`CHANGELOG.md`](CHANGELOG.md).
 
