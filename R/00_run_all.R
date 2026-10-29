@@ -7,9 +7,9 @@ use_renv <- FALSE
 render_manuscript <- TRUE
 
 ## Warnings (1 = print as they occur; 2 = turn warnings into errors)
+## (reset at the end of this script; on.exit() does not work at top level)
 .warn_prev <- getOption("warn")
 options(warn = 1)
-on.exit(options(warn = .warn_prev), add = TRUE)
 
 ## ---- Helpers ----------------------------------------------------------------
 run_step <- function(label, expr) {
@@ -30,7 +30,6 @@ if (!is.na(script_dir) && basename(script_dir) == "R") {
   setwd(dirname(script_dir))
 }
 
-## ---- Optional: renv restore (BEFORE setup/package loads) --------------------
 ## ---- Optional: renv restore (BEFORE setup/package loads) --------------------
 if (use_renv) {
   if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
@@ -69,24 +68,18 @@ for (s in appendix_scripts) {
   }
 }
 
-## ---- Render manuscript (from config) ----------------------------------------
+## ---- Render manuscript(s) (from config) -------------------------------------
 render_manuscript <- isTRUE(render_manuscript) && isTRUE(cfg$render$enable)
 
 if (render_manuscript) {
 
-  manuscript_input <- cfg$render$input
-  stop_if_missing(manuscript_input)
-
-  manuscript_type <- if (grepl("\\.qmd$", manuscript_input, ignore.case = TRUE)) {
-    "quarto"
-  } else {
-    "rmarkdown"
-  }
+  manuscript_inputs <- cfg$render$inputs
+  for (f in manuscript_inputs) stop_if_missing(f)
 
   add_date_prefix <- function(out_file) {
     if (!isTRUE(cfg$render$date_prefix)) return(out_file)
 
-    date_prefix <- format(Sys.Date(), "%Y%m%d_")
+    date_prefix <- format(Sys.Date(), "%y%m%d_")
 
     if (length(out_file) < 1 || is.null(out_file) || is.na(out_file[1])) {
       stop("Render did not return an output file path.", call. = FALSE)
@@ -103,29 +96,93 @@ if (render_manuscript) {
     new_file
   }
 
-  if (manuscript_type == "quarto") {
-    if (!requireNamespace("quarto", quietly = TRUE)) install.packages("quarto")
+  ## Versions: regular, plus *_blind (author info hidden) if render$anonymous
+  versions <- list(list(suffix = "", anonymous = FALSE))
+  if (isTRUE(cfg$render$anonymous)) {
+    versions <- c(versions, list(list(suffix = "_blind", anonymous = TRUE)))
+  }
 
-    run_step("Render Quarto manuscript", {
-      out_file <- quarto::quarto_render(
-        input      = manuscript_input,
-        output_dir = cfg$render$output_dir
-      )
-      add_date_prefix(out_file)
-    })
+  for (manuscript_input in manuscript_inputs) {
 
-  } else {
-    if (!requireNamespace("rmarkdown", quietly = TRUE)) install.packages("rmarkdown")
+    manuscript_type <- if (grepl("\\.qmd$", manuscript_input, ignore.case = TRUE)) {
+      "quarto"
+    } else {
+      "rmarkdown"
+    }
+    stem <- tools::file_path_sans_ext(basename(manuscript_input))
 
-    run_step("Knit R Markdown manuscript", {
-      out_file <- rmarkdown::render(
-        input      = manuscript_input,
-        output_dir = cfg$render$output_dir,
-        clean      = TRUE
-      )
-      add_date_prefix(out_file)
-    })
+    for (v in versions) {
+      label <- paste0(basename(manuscript_input), if (v$anonymous) " (blind)" else "")
+
+      if (manuscript_type == "quarto") {
+        if (!requireNamespace("quarto", quietly = TRUE)) {
+          stop("Missing package: quarto", call. = FALSE)
+        }
+
+        run_step(paste("Render Quarto:", label), {
+          out_file <- quarto::quarto_render(
+            input          = manuscript_input,
+            output_dir     = cfg$render$output_dir,
+            output_file    = paste0(stem, v$suffix, ".pdf"),
+            execute_params = list(anonymous = v$anonymous)
+          )
+          add_date_prefix(out_file)
+        })
+
+      } else {
+        run_step(paste("Knit R Markdown:", label), {
+          out_file <- rmarkdown::render(
+            input       = manuscript_input,
+            output_dir  = cfg$render$output_dir,
+            output_file = paste0(stem, v$suffix),
+            params      = list(anonymous = v$anonymous),
+            envir       = new.env(),
+            clean       = TRUE
+          )
+          add_date_prefix(out_file)
+        })
+      }
+    }
+  }
+
+  ## ---- Word count (source-based approximation, see R/helpers/manuscript.R) --
+  if (isTRUE(cfg$render$word_count)) {
+    wc <- do.call(rbind, lapply(manuscript_inputs, word_count_rmd))
+    wc_file <- file.path(cfg$render$output_dir, "word_count.txt")
+    writeLines(c(
+      paste("Word count (approximate), generated", format(Sys.time(), "%Y-%m-%d %H:%M")),
+      "Main text excludes abstract, keywords, tables, figures, references.",
+      "",
+      utils::capture.output(print(wc, row.names = FALSE))
+    ), wc_file)
+    message("\nWord count:\n", paste(utils::capture.output(print(wc, row.names = FALSE)),
+                                     collapse = "\n"))
   }
 }
 
+## ---- Session info (reproducibility record) ----------------------------------
+## NULL if git is unavailable or this is not a repository
+git_info <- function(args) {
+  out <- tryCatch(suppressWarnings(system2("git", args, stdout = TRUE, stderr = FALSE)),
+                  error = function(e) NULL)
+  if (!is.null(attr(out, "status"))) NULL else out
+}
+git_hash  <- git_info(c("rev-parse", "--short", "HEAD"))
+git_dirty <- git_info(c("status", "--porcelain"))
+git_line  <- if (length(git_hash) == 0) {
+  "n/a"
+} else {
+  paste(git_hash[1], if (length(git_dirty) > 0) "(uncommitted changes)" else "(clean)")
+}
+writeLines(c(
+  paste("Run:", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
+  paste("Template version:", cfg$template_version),
+  paste("Git commit:", git_line),
+  paste("Config:", config_path_default(),
+        if (!is.null(cfg$local_config)) paste("+", cfg$local_config) else ""),
+  "",
+  utils::capture.output(utils::sessionInfo())
+), file.path(paths$output_dir, "session_info.txt"))
+
+options(warn = .warn_prev)
 message("\nAll done.")
