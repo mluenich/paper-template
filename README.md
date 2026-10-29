@@ -31,3 +31,7 @@ This runs `R/01_import.R` to `R/04_figures_tables.R` (+ `R/10_appendix.R`), rend
 R (>= 4.1), a LaTeX distribution with XeLaTeX (e.g. TinyTeX), and the packages in `required_pkgs` (`R/00_setup.R`). Missing packages stop the run with an error (no automatic installation). `survey` is required only if `analysis$weight_var` is set, `zip` only for `R/99_export_osf.R`.
 
 Optional renv: set `use_renv <- TRUE` in `R/00_run_all.R` (default `FALSE`).
+
+## Use and license
+
+Create your own copy via **Use this template** on GitHub (or clone). Code and documentation: [MIT License](LICENSE). `manuscript/apa.csl`: CC BY-SA 3.0, from the [Citation Style Language styles repository](https://github.com/citation-style-language/styles).

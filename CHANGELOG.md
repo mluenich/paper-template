@@ -46,6 +46,7 @@ so fixes can be traced and backported.
 - `R/99_export_osf.R`: whitelist-based OSF reproduction zip without raw data.
 - `config/params.local.yml` (gitignored) merged over `params.yml`.
 - `.gitattributes` (LF), `CLAUDE.md` (working rules for LLM sessions).
+- `LICENSE` (MIT); `apa.csl` keeps CC BY-SA 3.0.
 - `.gitignore`: raw data except example, local config, knitr/LaTeX
   intermediates; `*.tex` restricted to `manuscript/`.
 
