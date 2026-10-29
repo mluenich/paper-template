@@ -8,6 +8,11 @@ if (!file.exists(infile)) stop("Missing input file: ", infile, call. = FALSE)
 
 dat <- readr::read_csv(infile, show_col_types = FALSE,
                        locale = readr::locale(encoding = "UTF-8"))
+
+## SPSS input (add "haven" to required_pkgs in 00_setup.R):
+## dat <- haven::read_sav(path_raw("wave1.sav"))
+## Keep value labels as factors where needed: haven::as_factor(dat$var)
+
 write_derived(dat, artifacts$import_rds)
 
 message("Wrote: ", outfile)

@@ -1,0 +1,27 @@
+# Normalise line endings: LF in the repository and in the working tree
+# (matches .editorconfig; RStudio on Windows handles LF natively).
+* text=auto eol=lf
+
+*.R     text eol=lf
+*.Rmd   text eol=lf
+*.qmd   text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.bib   text eol=lf
+*.csl   text eol=lf
+*.tex   text eol=lf
+*.csv   text eol=lf
+*.Rproj text eol=lf
+
+# Binary files: no conversion
+*.rds   binary
+*.RData binary
+*.rda   binary
+*.sav   binary
+*.dta   binary
+*.xlsx  binary
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.zip   binary

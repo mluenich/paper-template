@@ -1,0 +1,65 @@
+---
+title: "Online Appendix: Paper Title"
+author: "`r if (isTRUE(params$anonymous)) 'Anonymized for peer review' else '[Author 1], [Affiliation 1]'`"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: true
+    toc: true
+    keep_tex: true
+    fig_caption: true
+    extra_dependencies:
+      - booktabs
+      - longtable
+      - array
+      - float
+      - amsmath
+      - graphicx
+      - setspace
+      - geometry
+      - threeparttable
+      - threeparttablex
+      - multirow
+      - rotating
+geometry: margin=2.5cm
+fontsize: 12pt
+linestretch: 1.5
+bibliography: references.bib
+csl: apa.csl
+params:
+  anonymous: false          # set by R/00_run_all.R (render$anonymous)
+header-includes:
+  - \usepackage{caption}
+  - \captionsetup[table]{skip=6pt}
+  - \captionsetup[figure]{skip=6pt}
+  - \renewcommand{\thesection}{\Alph{section}}
+  - \renewcommand{\thetable}{A\arabic{table}}
+  - \renewcommand{\thefigure}{A\arabic{figure}}
+---
+
+```{r setup, include=FALSE}
+## Shared with paper.Rmd: knitr options, 00_setup.R, tables_tex, rpt.
+source(here::here("manuscript", "_setup.R"))
+```
+
+<!-- Appendix tables: build them in R/04_figures_tables.R or R/10_appendix.R,
+     store as tables_tex$tA1, ... and include via results='asis' chunks.
+     Labels: kbl(..., label = "a1") -> \ref{tab:a1}, numbered A1, A2, ... -->
+
+# Supplementary Analyses
+
+[TODO]
+
+# Measurement
+
+[TODO]
+
+# Preregistration
+
+[TODO: KAMAI copy of the preregistration text, if applicable.]
+
+# References {-}
+
+::: {#refs}
+:::

@@ -1,8 +1,6 @@
 ---
 title: "Paper Title"
-# author:
-#   - name: "[Author 1]"
-#     affiliation: "[Affiliation 1]"
+author: "`r if (isTRUE(params$anonymous)) 'Anonymized for peer review' else '[Author 1], [Affiliation 1]'`"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
   pdf_document:
@@ -30,7 +28,9 @@ geometry: margin=2.5cm
 fontsize: 12pt
 linestretch: 1.5
 bibliography: references.bib
-# csl: apa.csl
+csl: apa.csl
+params:
+  anonymous: false          # set by R/00_run_all.R (render$anonymous)
 header-includes:
   - \usepackage{caption}
   - \captionsetup[table]{skip=6pt}
@@ -38,41 +38,8 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-## ---- setup ----
-
-## Ensure knitr evaluates relative paths from the project root,
-## not from manuscript/ (where this .Rmd lives).
-knitr::opts_knit$set(root.dir = here::here())
-
-knitr::opts_chunk$set(
-  echo       = FALSE,
-  warning    = FALSE,
-  message    = FALSE,
-  fig.align  = "center",
-  fig.pos    = "H",
-  out.width  = "100%",
-  dpi        = 300
-)
-
-## ---- Load pipeline artifacts ------------------------------------------------
-## NOTE: This file is designed to be rendered by 00_run_all.R.
-##       At render time, the pipeline has already run 01--04 and all artifacts
-##       exist. If rendering standalone, ensure 00_run_all.R has completed.
-
-## Ensure working directory is project root before sourcing setup
-setwd(here::here())
-
-source(here::here("R/00_setup.R"))
-
-dat <- readRDS(path_derived(artifacts$clean_rds))
-fit <- readRDS(path_ckpt(artifacts$models_rds))
-
-## ---- LaTeX table objects (built by 04_figures_tables.R) ---------------------
-library(kableExtra)
-tables_tex <- readRDS(path_ckpt("tables_tex.rds"))
-
-## ---- Formatting helpers (mirror 00_setup.R, available for inline R) ---------
-## fmt_num() and fmt_p() are already loaded via 00_setup.R
+## Shared with appendix.Rmd: knitr options, 00_setup.R, tables_tex, rpt.
+source(here::here("manuscript", "_setup.R"))
 ```
 
 \newpage
@@ -88,7 +55,7 @@ tables_tex <- readRDS(path_ckpt("tables_tex.rds"))
 
 # Introduction
 
-[TODO]
+[TODO] Example citation [@example2024].
 
 # Method
 
@@ -96,15 +63,16 @@ tables_tex <- readRDS(path_ckpt("tables_tex.rds"))
 
 # Results
 
+[TODO] Example of inline reporting from `report.rds`: Across $N = `r rpt$n`$
+respondents, x predicted y, $B = `r rpt$b_x`$, $t(`r rpt$df_res`) = `r rpt$t_x`$,
+$p `r rpt$p_x`$ (Table \ref{tab:regression}, Figure \ref{fig:fig1}).
+
 ```{r table1-regression, results='asis'}
 tables_tex$t1
 ```
 
 ```{r fig1, fig.cap="Example Figure", fig.align="center", out.width="95%"}
-.src <- path_out_fig("figure1.png")
-if (file.exists(.src)) {
-  knitr::include_graphics(.src)
-}
+fig_include("figure1.png")
 ```
 
 # Discussion
@@ -115,7 +83,7 @@ if (file.exists(.src)) {
 
 [TODO]
 
-# References
+# References {-}
 
 ::: {#refs}
 :::
