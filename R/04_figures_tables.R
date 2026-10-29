@@ -37,9 +37,9 @@ coefs <- coefs[, c("term", "Estimate", "Std. Error", "t value", "Pr(>|t|)")]
 
 coefs_fmt <- data.frame(
   term = coefs$term,
-  B    = fmt_num(coefs$Estimate, 2),
-  SE   = fmt_num(coefs$`Std. Error`, 2),
-  t    = fmt_num(coefs$`t value`, 2),
+  B    = fmt_num(coefs$Estimate, 2, lead0 = TRUE),
+  SE   = fmt_num(coefs$`Std. Error`, 2, lead0 = TRUE),
+  t    = fmt_num(coefs$`t value`, 2, lead0 = TRUE),
   p    = fmt_p(coefs$`Pr(>|t|)`),
   stringsAsFactors = FALSE
 )
@@ -65,8 +65,8 @@ message("Wrote: ", path_out_tab("table1.csv"))
 ## Named list of pre-formatted strings; paper.Rmd uses `r rpt$...` only.
 rpt <- list(
   n      = nrow(dat),
-  b_x    = fmt_num(coef(fit)[["x"]], 2),
-  t_x    = fmt_num(coefs$`t value`[coefs$term == "x"], 2),
+  b_x    = fmt_num(coef(fit)[["x"]], 2, lead0 = TRUE),
+  t_x    = fmt_num(coefs$`t value`[coefs$term == "x"], 2, lead0 = TRUE),
   df_res = fit$df.residual,
   p_x    = fmt_p_inline(coefs$`Pr(>|t|)`[coefs$term == "x"]),
   r2     = fmt_num(summary(fit)$r.squared, 2)

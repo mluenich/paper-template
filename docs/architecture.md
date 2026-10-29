@@ -103,7 +103,7 @@ Required packages: `here`, `readr`, `dplyr`, `tidyr`, `tibble`, `ggplot2`, `ragg
 | File | Functions |
 |---|---|
 | `io.R` | `path_raw/derived/out_fig/out_tab/ckpt(...)`, `write_derived(x, fn)` / `read_derived(fn)`, `write_checkpoint(x, fn)` / `read_checkpoint(fn)`, `abs_path(p)` (anchor at project root), `recode_missing(df, vars, codes)` |
-| `fmt.R` | `fmt_num(x, d=3)` (strips leading zero, NA → dash), `fmt_p(p)` (table: `<.001`), `fmt_p_inline(p)` (text: `< .001` / `= .012`), `fmt_pct(p, d=1)` (input in %, no sign) |
+| `fmt.R` | `fmt_num(x, d=3, lead0=FALSE)` (strips leading zero unless `lead0 = TRUE`, NA → dash), `fmt_p(p)` (table: `<.001`), `fmt_p_inline(p)` (text: `< .001` / `= .012`), `fmt_pct(p, d=1)` (input in %, no sign) |
 | `tables.R` | `esc4(x)`, `tbl_tex(x, caption, label, col.names, align, escape = FALSE, note, font_size = 10, scale_down = FALSE, ...)` |
 | `figures.R` | `save_fig(plot, filename, width, height, dpi, pdf)`, `fig_include(filename)` |
 | `survey.R` | `make_design(df, weighted)`, `w_desc(df, vars)`, `w_props(df, var)`, `gm_table(df, y, by)` |
@@ -128,14 +128,14 @@ Setup chunk sources `manuscript/_setup.R`: sets `root.dir = here::here()` and ch
 
 `params: anonymous` (set by `00_run_all.R`) switches the author line for the blind version. `appendix.Rmd` numbers sections A, B, … and tables/figures A1, A2, … .
 
-Sections (paper): Abstract `{-}` → Introduction (§1) → Method → Results → Discussion → Conclusion → References.
+Sections (paper): Abstract `{-}` → Introduction (§1) → Method → Results → Discussion → Conclusion → References `{-}`.
 
 ## Design Notes
 
 - Table labels from `kbl(label=)` → `\label{tab:...}`; figure labels from chunk name → `\label{fig:<chunk>}`.
 - `fig_include()` passes an absolute path with `error = FALSE`: knitr writes `../output/figures/...` (no spaces from the Windows project path; resolved from the build dir). Do not reintroduce `tempdir()` copies.
 - `tbl_tex()` always applies `esc4()` to the note, because `footnote(escape = FALSE)` strips one backslash level (independent of `kbl(escape)`). Write notes with single escaping as in cells (`"$\\beta$"`).
-- `fmt_num()` always strips the leading zero (also for B, SE, t).
+- APA leading zero: `fmt_num(..., lead0 = TRUE)` for values that can exceed 1 (B, SE, t, M, SD); default strips it (r, β, α, R², p).
 - `here::here()` requires `.Rproj` or `.here` marker (present).
 - Word count is source-based (approximation): inline R, citation keys and `\ref{}` count as one word each.
 - No `renv.lock` shipped; user must init renv and `renv::snapshot()` separately.

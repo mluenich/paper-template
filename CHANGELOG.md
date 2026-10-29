@@ -14,6 +14,7 @@ so fixes can be traced and backported.
 - `options(warn = 1)` in `00_run_all.R` was reset immediately by a top-level
   `on.exit()`; now reset explicitly at the end of the script.
 - Example regression table now uses `fmt_num()`/`fmt_p()`.
+- References section unnumbered (APA).
 - Example figure: ggplot2 with fitted lines per group (replaces `abline()` on a
   three-coefficient model).
 
@@ -32,7 +33,8 @@ so fixes can be traced and backported.
 ### Added
 - `tbl_tex()` and `esc4()` (APA table with threeparttable note; LaTeX in notes
   is escaped automatically).
-- `fmt_p_inline()` (running text), `fmt_pct()`.
+- `fmt_p_inline()` (running text), `fmt_pct()`; `fmt_num(lead0 = TRUE)` keeps
+  the leading zero (APA: B, SE, t, M, SD).
 - `save_fig()` (ragg PNG, optional PDF; size/DPI from `figures` config).
 - Survey helpers (`make_design()`, `w_desc()`, `w_props()`, `gm_table()`),
   active when `analysis$weight_var` is set.

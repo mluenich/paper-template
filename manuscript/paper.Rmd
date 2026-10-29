@@ -83,7 +83,7 @@ fig_include("figure1.png")
 
 [TODO]
 
-# References
+# References {-}
 
 ::: {#refs}
 :::
