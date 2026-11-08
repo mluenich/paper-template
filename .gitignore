@@ -1,4 +1,6 @@
 # R
+.claude/settings.local.json
+.Renviron
 .Rhistory
 .Rdata
 .RData
